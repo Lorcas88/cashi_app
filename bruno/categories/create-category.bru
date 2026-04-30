@@ -1,0 +1,40 @@
+meta {
+  name: Create Category
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/categories
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Trabajo"
+  }
+}
+
+script:post-response {
+  if (res.status === 201 && res.body.id) {
+    bru.setEnvVar("categoryId", res.body.id);
+  }
+}
+
+docs {
+  Crea una nueva categoría.
+
+  ## Body
+  - name: Nombre de la categoría (requerido, max 50 chars, único)
+
+  ## Respuesta
+  Devuelve 201 con la categoría creada.
+  Devuelve 400 si el body es inválido.
+  Devuelve 409 si ya existe una categoría con ese nombre.
+}

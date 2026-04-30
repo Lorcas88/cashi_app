@@ -1,0 +1,36 @@
+meta {
+  name: Update Note
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/notes/{{noteId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Título actualizado",
+    "content": "Contenido actualizado"
+  }
+}
+
+docs {
+  Actualización parcial de una nota.
+
+  ## Body (todos los campos son opcionales)
+  - title: Nuevo título (max 100 chars)
+  - content: Nuevo contenido
+
+  ## Respuesta
+  Devuelve 200 con la nota actualizada.
+  Devuelve 400 si el body es inválido.
+  Devuelve 404 si la nota no existe.
+}

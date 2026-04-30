@@ -1,0 +1,19 @@
+meta {
+  name: Get Tags
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/tags
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Lista todas las etiquetas.
+}

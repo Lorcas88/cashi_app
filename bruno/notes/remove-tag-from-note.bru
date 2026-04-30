@@ -1,0 +1,23 @@
+meta {
+  name: Remove Tag from Note
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/notes/{{noteId}}/tags/{{tagId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Desasocia una etiqueta de una nota.
+
+  ## Respuesta
+  Devuelve 200 con mensaje de confirmación.
+  Devuelve 404 si la relación no existe.
+}

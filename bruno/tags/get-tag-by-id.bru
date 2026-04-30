@@ -1,0 +1,20 @@
+meta {
+  name: Get Tag by ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/tags/{{tagId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Retorna una etiqueta por su ID.
+  Devuelve 404 si no existe.
+}

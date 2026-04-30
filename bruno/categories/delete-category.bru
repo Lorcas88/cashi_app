@@ -1,0 +1,23 @@
+meta {
+  name: Delete Category
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/categories/{{categoryId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Elimina una categoría por su ID.
+
+  ## Respuesta
+  Devuelve 200 con mensaje de confirmación.
+  Devuelve 404 si la categoría no existe.
+}

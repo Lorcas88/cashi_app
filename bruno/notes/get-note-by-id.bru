@@ -1,0 +1,20 @@
+meta {
+  name: Get Note by ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/notes/{{noteId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Retorna el detalle de una nota por su ID.
+  Devuelve 404 si la nota no existe.
+}

@@ -1,0 +1,40 @@
+meta {
+  name: Create Tag
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/tags
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "importante"
+  }
+}
+
+script:post-response {
+  if (res.status === 201 && res.body.id) {
+    bru.setEnvVar("tagId", res.body.id);
+  }
+}
+
+docs {
+  Crea una nueva etiqueta.
+
+  ## Body
+  - name: Nombre de la etiqueta (requerido, max 50 chars, único)
+
+  ## Respuesta
+  Devuelve 201 con la etiqueta creada.
+  Devuelve 400 si el body es inválido.
+  Devuelve 409 si ya existe una etiqueta con ese nombre.
+}

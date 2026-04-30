@@ -1,0 +1,20 @@
+meta {
+  name: Get Category by ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/categories/{{categoryId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Retorna una categoría por su ID.
+  Devuelve 404 si no existe.
+}

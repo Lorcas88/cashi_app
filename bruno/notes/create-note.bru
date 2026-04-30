@@ -1,0 +1,43 @@
+meta {
+  name: Create Note
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/notes
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Mi primera nota",
+    "content": "Contenido de la nota",
+    "categoryId": 1
+  }
+}
+
+script:post-response {
+  if (res.status === 201 && res.body.id) {
+    bru.setEnvVar("noteId", res.body.id);
+  }
+}
+
+docs {
+  Crea una nueva nota.
+  
+  ## Body
+  - title: Título de la nota (requerido, max 100 chars)
+  - content: Contenido de la nota (requerido)
+  - categoryId: ID de la categoría (requerido, entero positivo)
+  
+  ## Respuesta
+  Devuelve 201 con la nota creada, incluyendo categoría.
+  Devuelve 400 con errores de validación si el body es inválido.
+}

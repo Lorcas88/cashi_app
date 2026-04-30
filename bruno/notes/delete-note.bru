@@ -1,0 +1,23 @@
+meta {
+  name: Delete Note
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/notes/{{noteId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Elimina una nota por su ID.
+
+  ## Respuesta
+  Devuelve 200 con mensaje de confirmación.
+  Devuelve 404 si la nota no existe.
+}

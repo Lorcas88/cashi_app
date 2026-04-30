@@ -1,0 +1,23 @@
+# Dependencias
+node_modules/
+
+# Build
+dist/
+
+# Prisma — código generado (se regenera con yarn prisma:generate)
+src/generated/
+
+# Variables de entorno — NUNCA subir al repo
+.env
+.env.*
+!.env.example
+
+# Prisma
+prisma/migrations/
+
+# Yarn
+.yarn/cache
+.yarn/install-state.gz
+
+# Logs
+*.log
