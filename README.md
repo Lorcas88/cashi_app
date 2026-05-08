@@ -33,7 +33,7 @@ cp .env.example .env
 El `.env` por defecto apunta a la base de datos que levanta Docker:
 
 ```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/notesdb"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/cashi_db"
 ```
 
 ### 3. Levantar la base de datos
@@ -62,7 +62,7 @@ Esto genera el cliente TypeScript en `src/generated/prisma/` a partir del schema
 yarn prisma:migrate
 ```
 
-Crea las tablas en la base de datos. La primera vez pedirá un nombre para la migración, puedes escribir `init`.
+Crea las tablas en la base de datos. La primera vez pedirá un nombre para la migración, puedes nombrarlo como `init`.
 
 ### 6. Iniciar el servidor
 
@@ -114,20 +114,20 @@ Define la forma que deben tener los datos de entrada usando Zod. Es la única fu
 
 ```
 src/schemas/
-└── notes.schema.ts    ← schemas de validación + tipos inferidos para los tres recursos
+├── categories.schema.ts
+└── transactions.schema.ts
 ```
 
-Los tipos (`CreateNoteInput`, `UpdateNoteInput`, etc.) se infieren directamente del schema con `z.infer`, por lo que nunca están desincronizados con las reglas de validación.
+Los tipos (`CreateCategoryInput`, `UpdateCategoryInput`, etc.) se infieren directamente del schema con `z.infer`, por lo que nunca están desincronizados con las reglas de validación.
 
 ### `src/repositories/`
 
-Única capa que habla con la base de datos. Cada repositorio define primero una interfaz TypeScript que actúa como contrato, y luego un objeto literal que implementa ese contrato usando Prisma. Si en el futuro se cambia de ORM o de base de datos, solo cambia este archivo — el resto del sistema no se entera.
+Única capa que habla con la base de datos. Cada repositorio define primero una interfaz TypeScript que actúa como contrato, y luego un objeto literal que implementa ese contrato usando Prisma.
 
 ```
 src/repositories/
-├── notes.repository.ts        ← interfaz NoteRepository + implementación Prisma
-├── categories.repository.ts   ← interfaz CategoryRepository + implementación Prisma
-└── tags.repository.ts         ← interfaz TagRepository + implementación Prisma
+├── categories.repository.ts        ← interfaz CategoryRepository + implementación Prisma
+└── transactions.repository.ts      ← interfaz TransactionRepository + implementación Prisma
 ```
 
 Los métodos del repository devuelven tipos extendidos (`NoteWithRelations`) que incluyen las relaciones cargadas con `include`, ya que los tipos base de Prisma no las incluyen por defecto.
@@ -138,9 +138,8 @@ Coordina el flujo de cada endpoint: extrae datos del request, valida con Zod usa
 
 ```
 src/controllers/
-├── notes.controller.ts
 ├── categories.controller.ts
-└── tags.controller.ts
+└── transactions.controller.ts
 ```
 
 Los errores de Prisma se capturan con `try/catch` y se delegan a `parsePrismaError` para convertirlos en respuestas HTTP con el status correcto.
@@ -151,9 +150,8 @@ Solo mapea URLs a funciones de controller. No contiene lógica, validaciones ni 
 
 ```
 src/routes/
-├── notes.routes.ts        ← GET /notes, POST /notes, PATCH /notes/:id, etc.
-├── categories.routes.ts   ← GET /categories, POST /categories, etc.
-└── tags.routes.ts         ← GET /tags, POST /tags, etc.
+├── categories.routes.ts        ← GET /categories, POST /categories, etc.
+└── transactions.routes.ts      ← GET /tags, POST /tags, etc.
 ```
 
 ### `src/lib/`
@@ -241,9 +239,9 @@ La carpeta `bruno/` contiene una colección lista para usar con [Bruno](https://
 El orden recomendado para probar por primera vez:
 
 1. Crear una categoría (`POST /categories`)
-2. Crear un tag (`POST /tags`)
-3. Crear una nota con el `categoryId` obtenido en el paso 1
-4. Asociar el tag a la nota
+2. Crear una transaccion (`POST /transactions`) de tipo income
+3. Crear una transaccion (`POST /transactions`) de tipo expense
+4. Consultar el balance (`GET /transactions/balance`)
 
 ---
 

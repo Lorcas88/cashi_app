@@ -5,7 +5,7 @@ import type {
 } from '../schemas/transactions.schema.js'
 import type { Transaction } from '../generated/prisma/client.js'
 
-interface TransactionsRepository {
+interface TransactionRepository {
   findAll:  ()                                => Promise<Transaction[]>
   findById: (id: number)                      => Promise<Transaction | null>
   create:   (data: CreateTransactionInput)    => Promise<Transaction>
@@ -13,7 +13,7 @@ interface TransactionsRepository {
   remove:   (id: number)                      => Promise<void>
 }
 
-export const transactionsRepository: TransactionsRepository = {
+export const transactionsRepository: TransactionRepository = {
   findAll: () =>
     prisma.transaction.findMany({
       include: {
