@@ -8,7 +8,7 @@ import tagsRouter       from './routes/tags.routes.js'
 const app = new Hono()
 
 // Health check
-app.get('/', (c) => c.json({ status: 'ok', message: 'API de Notas — Unidad 2' }))
+app.get('/', (c) => c.json({ status: 'ok', message: 'API de Finanzas — Cashi' }))
 
 // Montar routers por recurso
 app.route('/notes',      notesRouter)

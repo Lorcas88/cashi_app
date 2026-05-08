@@ -1,5 +1,5 @@
 meta {
-  name: Get Category by ID
+  name: Get Category By Id
   type: http
   seq: 2
 }
@@ -14,7 +14,15 @@ headers {
   Accept: application/json
 }
 
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  categoryId: 1
+}
+
 docs {
-  Retorna una categoría por su ID.
-  Devuelve 404 si no existe.
+  Obtiene una categoría por ID.
+  
+  ## Respuesta
+  - 200: categoría encontrada
+  - 404: categoría no existe
 }

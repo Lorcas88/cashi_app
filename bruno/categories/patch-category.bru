@@ -1,0 +1,36 @@
+meta {
+  name: Update Category
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/categories/{{categoryId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Trabajo Actualizado"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  categoryId: 1
+}
+
+docs {
+  Actualiza una categoría existente.
+  
+  ## Respuesta
+  - 200: categoría actualizada
+  - 400: validación fallida
+  - 404: no encontrada
+}

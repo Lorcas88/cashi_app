@@ -14,6 +14,13 @@ headers {
   Accept: application/json
 }
 
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
 docs {
   Lista todas las categorías.
+  
+  ## Respuesta
+  - 200: array de categorías
 }

@@ -1,7 +1,7 @@
 meta {
   name: Delete Category
   type: http
-  seq: 4
+  seq: 5
 }
 
 delete {
@@ -14,10 +14,15 @@ headers {
   Accept: application/json
 }
 
-docs {
-  Elimina una categoría por su ID.
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  categoryId: 1
+}
 
+docs {
+  Elimina una categoría.
+  
   ## Respuesta
-  Devuelve 200 con mensaje de confirmación.
-  Devuelve 404 si la categoría no existe.
+  - 200: mensaje de éxito
+  - 404: categoría no existe
 }

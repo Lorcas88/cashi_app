@@ -21,20 +21,23 @@ body:json {
   }
 }
 
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
 script:post-response {
-  if (res.status === 201 && res.body.id) {
-    bru.setEnvVar("categoryId", res.body.id);
+  const status = res.getStatus()
+  const body = res.getBody()
+  
+  if (status === 201 && body && body.id) {
+    bru.setEnvVar("categoryId", body.id)
   }
 }
 
 docs {
-  Crea una nueva categoría.
-
-  ## Body
-  - name: Nombre de la categoría (requerido, max 50 chars, único)
-
+  Crea una categoría.
+  
   ## Respuesta
-  Devuelve 201 con la categoría creada.
-  Devuelve 400 si el body es inválido.
-  Devuelve 409 si ya existe una categoría con ese nombre.
+  - 201: categoría creada
+  - 400: validación fallida
 }
