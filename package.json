@@ -1,5 +1,5 @@
 {
-  "name": "desarrollo-web-hono-api",
+  "name": "cashi-api",
   "version": "1.0.0",
   "description": "API de Notas con arquitectura N-Layer: Hono + Prisma + Zod + PostgreSQL",
   "main": "dist/index.js",

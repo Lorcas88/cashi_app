@@ -3,12 +3,12 @@ version: '3.8'
 services:
   db:
     image: postgres:16
-    container_name: notes_db
+    container_name: cashi_db
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: notesdb
+      POSTGRES_DB: cashi_db
     ports:
       - '5432:5432'
     volumes:
