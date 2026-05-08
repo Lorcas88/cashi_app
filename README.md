@@ -1,6 +1,6 @@
-# API de Notas — Unidad 2
+# API de Finanzas — Cashi
 
-API REST construida con arquitectura N-Layer. Permite gestionar notas organizadas por categorías y etiquetadas con tags.
+API REST construida con arquitectura N-Layer para gestionar transacciones financieras personales.
 
 **Stack:** Node.js · TypeScript · Hono · Prisma 7 · Zod · PostgreSQL · Docker
 
@@ -76,14 +76,14 @@ El servidor queda disponible en `http://localhost:3000`.
 
 ## Scripts disponibles
 
-| Script | Descripción |
-|---|---|
-| `yarn dev` | Servidor en modo desarrollo con hot reload |
-| `yarn build` | Compila el proyecto con tsdown |
-| `yarn start` | Corre el build compilado |
-| `yarn prisma:generate` | Regenera el cliente Prisma desde el schema |
-| `yarn prisma:migrate` | Crea y aplica migraciones |
-| `yarn prisma:studio` | Abre Prisma Studio (interfaz visual de la BD) |
+| Script                 | Descripción                                   |
+| ---------------------- | --------------------------------------------- |
+| `yarn dev`             | Servidor en modo desarrollo con hot reload    |
+| `yarn build`           | Compila el proyecto con tsdown                |
+| `yarn start`           | Corre el build compilado                      |
+| `yarn prisma:generate` | Regenera el cliente Prisma desde el schema    |
+| `yarn prisma:migrate`  | Crea y aplica migraciones                     |
+| `yarn prisma:studio`   | Abre Prisma Studio (interfaz visual de la BD) |
 
 ---
 
@@ -170,11 +170,11 @@ src/lib/
 
 `prisma-error.ts` centraliza el mapeo de códigos de error de Prisma a status HTTP:
 
-| Código Prisma | Status HTTP | Causa |
-|---|---|---|
-| `P2002` | 409 Conflict | Valor duplicado en campo único |
-| `P2003` | 422 Unprocessable Entity | Foreign key que no existe |
-| `P2025` | 404 Not Found | Registro no encontrado |
+| Código Prisma | Status HTTP              | Causa                          |
+| ------------- | ------------------------ | ------------------------------ |
+| `P2002`       | 409 Conflict             | Valor duplicado en campo único |
+| `P2003`       | 422 Unprocessable Entity | Foreign key que no existe      |
+| `P2025`       | 404 Not Found            | Registro no encontrado         |
 
 ### `src/generated/`
 
@@ -188,35 +188,26 @@ Entry point de la aplicación. Carga las variables de entorno, crea la instancia
 
 ## Endpoints
 
-### Notas
+### Transactions
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/notes` | Lista todas las notas con categoría y tags |
-| GET | `/notes/:id` | Detalle de una nota |
-| POST | `/notes` | Crea una nota |
-| PATCH | `/notes/:id` | Actualiza título y/o contenido |
-| DELETE | `/notes/:id` | Elimina una nota |
-| POST | `/notes/:id/tags` | Asocia un tag existente a una nota |
-| DELETE | `/notes/:id/tags/:tagId` | Desasocia un tag de una nota |
+| Método | Ruta                    | Descripción                                   |
+| ------ | ----------------------- | --------------------------------------------- |
+| GET    | `/transactions`         | Lista todas las transacciones                 |
+| GET    | `/transactions/balance` | Obtiene el balance total (ingresos - egresos) |
+| GET    | `/transactions/:id`     | Detalle de una transacción                    |
+| POST   | `/transactions`         | Crea una transacción                          |
+| PATCH  | `/transactions/:id`     | Actualiza una transacción                     |
+| DELETE | `/transactions/:id`     | Elimina una transacción                       |
 
 ### Categorías
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/categories` | Lista todas las categorías |
-| GET | `/categories/:id` | Detalle de una categoría |
-| POST | `/categories` | Crea una categoría |
-| DELETE | `/categories/:id` | Elimina una categoría |
-
-### Tags
-
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/tags` | Lista todos los tags |
-| GET | `/tags/:id` | Detalle de un tag |
-| POST | `/tags` | Crea un tag |
-| DELETE | `/tags/:id` | Elimina un tag |
+| Método | Ruta              | Descripción                                      |
+| ------ | ----------------- | ------------------------------------------------ |
+| GET    | `/categories`     | Lista todas las categorías                       |
+| GET    | `/categories/:id` | Detalle de una categoría (con sus transacciones) |
+| POST   | `/categories`     | Crea una categoría                               |
+| PATCH  | `/categories/:id` | Actualiza una categoría                          |
+| DELETE | `/categories/:id` | Elimina una categoría                            |
 
 ---
 

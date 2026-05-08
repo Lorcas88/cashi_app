@@ -1,0 +1,19 @@
+meta {
+  name: Get Transaction by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/transactions/{{transactionId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Obtiene una transacción específica por su ID.
+}

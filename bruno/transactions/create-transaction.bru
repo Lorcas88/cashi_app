@@ -1,0 +1,47 @@
+meta {
+  name: Create Transaction
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/transactions
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "amount": 30000,
+    "type": "income",
+    "description": "Pago por revisión de computador",
+    "date": "2026-05-08",
+    "categoryId": 1
+  }
+}
+
+script:post-response {
+  if (res.status === 201 && res.body.id) {
+    bru.setEnvVar("transactionId", res.body.id);
+  }
+}
+
+docs {
+  Crea una nueva transacción.
+  
+  ## Body
+  - amount: Monto de la transacción (requerido, decimal positivo)
+  - type: Tipo de transacción. Solo puede contener "income" o "expense"
+  - description: Descripción de la transacción
+  - date: Fecha de la transacción
+  - categoryId: ID de la categoría (requerido, entero positivo)
+  
+  ## Respuesta
+  Devuelve 201 con la transacción creada, incluyendo categoría.
+  Devuelve 400 con errores de validación si el body es inválido.
+}

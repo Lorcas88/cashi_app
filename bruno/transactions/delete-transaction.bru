@@ -1,0 +1,19 @@
+meta {
+  name: Delete Transaction
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/transactions/{{transactionId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Elimina una transacción por su ID.
+}

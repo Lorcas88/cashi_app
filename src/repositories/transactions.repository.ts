@@ -6,11 +6,11 @@ import type {
 import type { Transaction } from '../generated/prisma/client.js'
 
 interface TransactionsRepository {
-  findAll: () => Promise<Transaction[]>
-  findById: (id: number) => Promise<Transaction | null>
-  create: (data: CreateTransactionInput) => Promise<Transaction>
-  update: (id: number, data: UpdateTransactionInput) => Promise<Transaction>
-  remove: (id: number) => Promise<void>
+  findAll:  ()                                => Promise<Transaction[]>
+  findById: (id: number)                      => Promise<Transaction | null>
+  create:   (data: CreateTransactionInput)    => Promise<Transaction>
+  update:   (id: number, data: UpdateTransactionInput) => Promise<Transaction>
+  remove:   (id: number)                      => Promise<void>
 }
 
 export const transactionsRepository: TransactionsRepository = {

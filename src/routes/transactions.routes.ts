@@ -11,14 +11,14 @@ import {
 
 const transactionsRouter = new Hono()
 
+// Balance (debe ir antes de las rutas con parámetros para que no sea capturado por /:id)
+transactionsRouter.get('/balance', getBalance)
+
 // CRUD Transactions
 transactionsRouter.get('/', getTransactions)
 transactionsRouter.get('/:id', getTransactionById)
 transactionsRouter.post('/', createTransaction)
 transactionsRouter.patch('/:id', updateTransaction)
 transactionsRouter.delete('/:id', deleteTransaction)
-
-// Balance
-transactionsRouter.get('/balance', getBalance)
 
 export default transactionsRouter

@@ -1,11 +1,11 @@
 meta {
-  name: Update Note
+  name: Update Transaction
   type: http
   seq: 4
 }
 
 patch {
-  url: {{baseUrl}}/notes/{{noteId}}
+  url: {{baseUrl}}/transactions/{{transactionId}}
   body: json
   auth: none
 }
@@ -17,8 +17,7 @@ headers {
 
 body:json {
   {
-    "title": "Título actualizado",
-    "content": "Contenido actualizado"
+    "description": "Pago por revisión de computador (actualizado)"
   }
 }
 

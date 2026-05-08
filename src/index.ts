@@ -1,9 +1,8 @@
 import 'dotenv/config'
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import notesRouter      from './routes/notes.routes.js'
 import categoriesRouter from './routes/categories.routes.js'
-import tagsRouter       from './routes/tags.routes.js'
+import transactionRouter from './routes/transactions.routes.js'
 
 const app = new Hono()
 
@@ -11,9 +10,8 @@ const app = new Hono()
 app.get('/', (c) => c.json({ status: 'ok', message: 'API de Finanzas — Cashi' }))
 
 // Montar routers por recurso
-app.route('/notes',      notesRouter)
 app.route('/categories', categoriesRouter)
-app.route('/tags',       tagsRouter)
+app.route('/transactions', transactionRouter)
 
 const PORT = Number(process.env.PORT) || 3000
 
