@@ -9,9 +9,9 @@ datasource db {
 
 // Una categoría tiene muchas transacciones (one-to-many)
 model Category {
-  id    Int           @id @default(autoincrement())
-  name  String        @unique
-  notes Transaction[]
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  transactions Transaction[]
 }
 
 // Dos posibles valores para el campo type de Transacciones
@@ -25,7 +25,7 @@ model Transaction {
   id          Int             @id @default(autoincrement())
   amount      Int
   type        TransactionType
-  description String
+  description String?
   date        DateTime        @db.Date
   category    Category        @relation(fields: [categoryId], references: [id])
   categoryId  Int // foreign key

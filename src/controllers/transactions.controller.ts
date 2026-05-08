@@ -9,8 +9,6 @@ import { parsePrismaError } from '../lib/prisma-error.js'
 // GET /transactions
 export const getTransactions = async (c: Context) => {
   const transactions = await transactionsRepository.findAll()
-  console.log(transactions);
-  
   return c.json(transactions)
 }
 
