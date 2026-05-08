@@ -1,57 +1,59 @@
 import type { Context } from 'hono'
-import { categoriesRepository } from '../repositories/categories.repository.js'
+import { transactionsRepository } from '../repositories/transactions.repository.js'
 import {
-  createCategorySchema,
-  updateCategorySchema
-} from '../schemas/categories.schema.js'
+  createTransactionSchema,
+  updateTransactionSchema
+} from '../schemas/transactions.schema.js'
 import { parsePrismaError } from '../lib/prisma-error.js'
 
-// GET /categories
-export const getCategories = async (c: Context) => {
-  const categories = await categoriesRepository.findAll()
-  return c.json(categories)
+// GET /transactions
+export const getTransactions = async (c: Context) => {
+  const transactions = await transactionsRepository.findAll()
+  return c.json(transactions)
 }
 
-// GET /categories/:id
-export const getCategoryById = async (c: Context) => {
+// GET /transactions/:id
+export const getTransactionById = async (c: Context) => {
   const id = Number(c.req.param('id'))
 
-  const category = await categoriesRepository.findById(id)
-  if (!category) return c.json({ error: 'Categoría no encontrada' }, 404)
+  const transaction = await transactionsRepository.findById(id)
+  if (!transaction) {
+    return c.json({ error: 'Transacción no encontrada' }, 404)
+  }
 
-  return c.json(category)
+  return c.json(transaction)
 }
 
-// POST /categories
-export const createCategory = async (c: Context) => {
+// POST /transactions
+export const createTransaction = async (c: Context) => {
   const body = await c.req.json()
 
-  const result = createCategorySchema.safeParse(body)
+  const result = createTransactionSchema.safeParse(body)
   if (!result.success) {
     return c.json({ errors: result.error.issues }, 400)
   }
 
   try {
-    const category = await categoriesRepository.create(result.data)
-    return c.json(category, 201)
+    const transaction = await transactionsRepository.create(result.data)
+    return c.json(transaction, 201)
   } catch (error) {
     const { status, message } = parsePrismaError(error)
     return c.json({ error: message }, status)
   }
 }
 
-// PATCH /categories/:id
-export const updateCategory = async (c: Context) => {
+// PATCH /transactions/:id
+export const updateTransaction = async (c: Context) => {
   const id = Number(c.req.param('id'))
   const body = await c.req.json()
 
-  const result = updateCategorySchema.safeParse(body)
+  const result = updateTransactionSchema.safeParse(body)
   if (!result.success) {
     return c.json({ errors: result.error.issues }, 400)
   }
 
   try {
-    const updated = await categoriesRepository.update(id, result.data)
+    const updated = await transactionsRepository.update(id, result.data)
     return c.json(updated)
   } catch (error) {
     const { status, message } = parsePrismaError(error)
@@ -59,15 +61,36 @@ export const updateCategory = async (c: Context) => {
   }
 }
 
-// DELETE /categories/:id
-export const deleteCategory = async (c: Context) => {
+// DELETE /transactions/:id
+export const deleteTransaction = async (c: Context) => {
   const id = Number(c.req.param('id'))
 
   try {
-    await categoriesRepository.remove(id)
-    return c.json({ message: 'Categoría eliminada' })
+    await transactionsRepository.remove(id)
+    return c.json({ message: 'Transacción eliminada' })
   } catch (error) {
     const { status, message } = parsePrismaError(error)
     return c.json({ error: message }, status)
   }
+}
+
+// GET /transactions/balance
+export const getBalance = async (c: Context) => {
+  const transactions = await transactionsRepository.findAll()
+
+  const totalIncome = transactions
+    .filter(t => t.type === 'income')
+    .reduce((acc, t) => acc + t.amount, 0)
+
+  const totalExpense = transactions
+    .filter(t => t.type === 'expense')
+    .reduce((acc, t) => acc + t.amount, 0)
+
+  const balance = totalIncome - totalExpense
+
+  return c.json({
+    totalIncome,
+    totalExpense,
+    balance
+  })
 }
