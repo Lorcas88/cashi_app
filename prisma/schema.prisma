@@ -7,38 +7,26 @@ datasource db {
   provider = "postgresql"
 }
 
-// Una categoría tiene muchas notas (one-to-many)
+// Una categoría tiene muchas transacciones (one-to-many)
 model Category {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  notes Note[]
+  id    Int           @id @default(autoincrement())
+  name  String        @unique
+  notes Transaction[]
 }
 
-// Una etiqueta puede estar en muchas notas (many-to-many)
-model Tag {
-  id    Int       @id @default(autoincrement())
-  name  String    @unique
-  notes NoteTag[]
+// Dos posibles valores para el campo type de Transacciones
+enum TransactionType {
+  income
+  expense
 }
 
-// Una nota pertenece a una categoría y puede tener muchas etiquetas
-model Note {
-  id         Int       @id @default(autoincrement())
-  title      String
-  content    String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  category   Category  @relation(fields: [categoryId], references: [id])
-  categoryId Int
-  tags       NoteTag[]
-}
-
-// Tabla intermedia para la relación many-to-many entre Note y Tag
-model NoteTag {
-  note   Note @relation(fields: [noteId], references: [id])
-  noteId Int
-  tag    Tag  @relation(fields: [tagId], references: [id])
-  tagId  Int
-
-  @@id([noteId, tagId])
+// Una transaccion pertenece a una categoría y puede tener muchas etiquetas
+model Transaction {
+  id          Int             @id @default(autoincrement())
+  amount      Int
+  type        TransactionType
+  description String
+  date        DateTime        @db.Date
+  category    Category        @relation(fields: [categoryId], references: [id])
+  categoryId  Int // foreign key
 }
