@@ -12,9 +12,6 @@ src/generated/
 .env.*
 !.env.example
 
-# Prisma
-prisma/migrations/
-
 # Yarn
 .yarn/cache
 .yarn/install-state.gz
