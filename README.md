@@ -130,7 +130,7 @@ src/repositories/
 └── transactions.repository.ts      ← interfaz TransactionRepository + implementación Prisma
 ```
 
-Los métodos del repository devuelven tipos extendidos (`NoteWithRelations`) que incluyen las relaciones cargadas con `include`, ya que los tipos base de Prisma no las incluyen por defecto.
+Los métodos del repository devuelven tipos extendidos (por ejemplo, `TransactionWithCategory`) que incluyen las relaciones cargadas con `include`, ya que los tipos base de Prisma no las incluyen por defecto.
 
 ### `src/controllers/`
 
@@ -151,7 +151,7 @@ Solo mapea URLs a funciones de controller. No contiene lógica, validaciones ni 
 ```
 src/routes/
 ├── categories.routes.ts        ← GET /categories, POST /categories, etc.
-└── transactions.routes.ts      ← GET /tags, POST /tags, etc.
+└── transactions.routes.ts      ← GET /transactions, POST /transactions, etc.
 ```
 
 ### `src/lib/`
@@ -214,7 +214,7 @@ Entry point de la aplicación. Carga las variables de entorno, crea la instancia
 ```
 ├── bruno/                  ← colección Bruno para probar la API
 ├── prisma/
-│   └── schema.prisma       ← modelos: Note, Category, Tag, NoteTag
+│   └── schema.prisma       ← modelos: Transaction, Category
 ├── prisma.config.ts        ← configuración de Prisma 7 (datasource, migraciones)
 ├── src/
 │   ├── index.ts
@@ -229,6 +229,12 @@ Entry point de la aplicación. Carga las variables de entorno, crea la instancia
 ├── .env.example
 └── tsconfig.json
 ```
+
+---
+
+## Uso de IA
+
+Se hizo uso de Inteligencia artificial para detectar errores en nombres y referencias, además como asistente para construir las validaciones de Zod y aclarar el como usar Prisma.
 
 ---
 

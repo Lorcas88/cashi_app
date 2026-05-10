@@ -3,11 +3,15 @@ import type {
   CreateTransactionInput,
   UpdateTransactionInput
 } from '../schemas/transactions.schema.js'
-import type { Transaction } from '../generated/prisma/client.js'
+import type { Prisma, Transaction } from '../generated/prisma/client.js'
+
+export type TransactionWithCategory = Prisma.TransactionGetPayload<{
+  include: { category: true }
+}>
 
 interface TransactionRepository {
-  findAll:  ()                                => Promise<Transaction[]>
-  findById: (id: number)                      => Promise<Transaction | null>
+  findAll:  ()                                => Promise<TransactionWithCategory[]>
+  findById: (id: number)                      => Promise<TransactionWithCategory | null>
   create:   (data: CreateTransactionInput)    => Promise<Transaction>
   update:   (id: number, data: UpdateTransactionInput) => Promise<Transaction>
   remove:   (id: number)                      => Promise<void>

@@ -1,7 +1,7 @@
 {
   "name": "cashi-api",
   "version": "1.0.0",
-  "description": "API de Notas con arquitectura N-Layer: Hono + Prisma + Zod + PostgreSQL",
+  "description": "API de Finanzas personales con arquitectura N-Layer: Hono + Prisma + Zod + PostgreSQL",
   "main": "dist/index.js",
   "packageManager": "yarn@1.22.4",
   "scripts": {
