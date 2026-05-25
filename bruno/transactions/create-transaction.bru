@@ -7,16 +7,11 @@ meta {
 post {
   url: {{baseUrl}}/transactions
   body: json
-  auth: bearer
+  auth: none
 }
 
 headers {
-  Accept: application/json
   Content-Type: application/json
-}
-
-auth:bearer {
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2FybG9zQGV4YW1wbGUuY29tIiwiZXhwIjoxNzgwMzE5MDg4fQ.xKh8nsBTfbdbBOk9hjBeZ-BJqx2jfB-4dQvCBtDnDN4
 }
 
 body:json {
@@ -25,7 +20,7 @@ body:json {
     "type": "income",
     "description": "Pago por revisión de computador",
     "date": "2026-05-08",
-    "receiptUrl": "https://pub-3329e0de8b4441a79e8d44ffdb4fd21b.r2.dev/receipts/dd23d35a-5c5a-484b-8b1a-26a4a95722fe.jpg",
+    "receiptUrl": "{{urlReceipt}}",
     "categoryId": 1
   }
 }
@@ -44,6 +39,7 @@ docs {
   - type: Tipo de transacción. Solo puede contener "income" o "expense"
   - description: Descripción de la transacción
   - date: Fecha de la transacción
+  - receiptUrl: URL del comprobante previamente subido
   - categoryId: ID de la categoría (requerido, entero positivo)
   
   ## Respuesta

@@ -1,0 +1,34 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "admin@example.com",
+    "password": "123456"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setEnvVar('token', data.token);
+}
+
+docs {
+  Lista todas las categorías.
+  
+  ## Respuesta
+  - 200: array de categorías
+}

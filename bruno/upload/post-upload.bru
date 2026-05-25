@@ -1,0 +1,24 @@
+meta {
+  name: Upload Image
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/transactions/upload
+  body: multipartForm
+}
+
+body:multipart-form {
+  receipt: @file(../test-assets/receipt-test.jpg)
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setEnvVar('urlReceipt', data.receiptUrl);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
