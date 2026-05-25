@@ -56,13 +56,25 @@ yarn prisma:generate
 
 Esto genera el cliente TypeScript en `src/generated/prisma/` a partir del schema.
 
-### 5. Correr las migraciones
+### 5. Correr las migraciones y seeder
 
 ```bash
 yarn prisma:migrate
 ```
 
 Crea las tablas en la base de datos. La primera vez pedirá un nombre para la migración, puedes nombrarlo como `init`.
+
+Si se está haciendo un pull de los cambios recientes y se desea borrar la Base de Datos, ejecutar el siguiente comando:
+
+```bash
+yarn prisma migrate reset
+```
+
+Luego, para poblar la base con los datos de prueba
+
+```bash
+yarn prisma db seed
+```
 
 ### 6. Iniciar el servidor
 
@@ -115,10 +127,11 @@ Define la forma que deben tener los datos de entrada usando Zod. Es la única fu
 ```
 src/schemas/
 ├── categories.schema.ts
-└── transactions.schema.ts
+├── transactions.schema.ts
+└── auth.schema.ts
 ```
 
-Los tipos (`CreateCategoryInput`, `UpdateCategoryInput`, etc.) se infieren directamente del schema con `z.infer`, por lo que nunca están desincronizados con las reglas de validación.
+Los tipos (`CreateCategoryInput`, `UpdateCategoryInput`, `RegisterInput`, `LoginInput`, etc.) se infieren directamente del schema con `z.infer`, por lo que nunca están desincronizados con las reglas de validación.
 
 ### `src/repositories/`
 
@@ -127,7 +140,8 @@ Los tipos (`CreateCategoryInput`, `UpdateCategoryInput`, etc.) se infieren direc
 ```
 src/repositories/
 ├── categories.repository.ts        ← interfaz CategoryRepository + implementación Prisma
-└── transactions.repository.ts      ← interfaz TransactionRepository + implementación Prisma
+├── transactions.repository.ts      ← interfaz TransactionRepository + implementación Prisma
+└── users.repository.ts             ← interfaz UserRepository + implementación Prisma
 ```
 
 Los métodos del repository devuelven tipos extendidos (por ejemplo, `TransactionWithCategory`) que incluyen las relaciones cargadas con `include`, ya que los tipos base de Prisma no las incluyen por defecto.
@@ -139,10 +153,21 @@ Coordina el flujo de cada endpoint: extrae datos del request, valida con Zod usa
 ```
 src/controllers/
 ├── categories.controller.ts
-└── transactions.controller.ts
+├── transactions.controller.ts
+├── auth.controller.ts
+└── upload.controller.ts
 ```
 
 Los errores de Prisma se capturan con `try/catch` y se delegan a `parsePrismaError` para convertirlos en respuestas HTTP con el status correcto.
+
+### `src/middlewares/`
+
+Funciones de middleware reutilizables que se aplican a las rutas.
+
+```
+src/middlewares/
+└── auth.middleware.ts        ← verifica JWT y extrae userId
+```
 
 ### `src/routes/`
 
@@ -151,7 +176,8 @@ Solo mapea URLs a funciones de controller. No contiene lógica, validaciones ni 
 ```
 src/routes/
 ├── categories.routes.ts        ← GET /categories, POST /categories, etc.
-└── transactions.routes.ts      ← GET /transactions, POST /transactions, etc.
+├── transactions.routes.ts      ← GET /transactions, POST /transactions, POST /transactions/upload, etc.
+└── auth.routes.ts              ← POST /auth/register, POST /auth/login
 ```
 
 ### `src/lib/`
@@ -161,7 +187,9 @@ Utilidades compartidas que no pertenecen a ninguna capa específica.
 ```
 src/lib/
 ├── prisma.ts          ← singleton de PrismaClient con driver adapter
-└── prisma-error.ts    ← helper para convertir errores de Prisma en respuestas HTTP
+├── prisma-error.ts    ← helper para convertir errores de Prisma en respuestas HTTP
+├── upload.ts          ← servicio para subir archivos (estrategia dual: local o R2)
+└── r2.ts              ← configuración del cliente AWS S3 para Cloudflare R2
 ```
 
 `prisma.ts` exporta una única instancia de `PrismaClient` usada por todos los repositories. Crear múltiples instancias agota el pool de conexiones.
@@ -184,28 +212,72 @@ Entry point de la aplicación. Carga las variables de entorno, crea la instancia
 
 ---
 
+## Autenticación
+
+La API usa JWT Bearer Token.
+
+Las rutas protegidas requieren:
+
+Authorization: Bearer <token>
+
+El token se obtiene mediante:
+
+- POST /auth/register
+- POST /auth/login
+
+---
+
+## Upload de comprobantes
+
+La API soporta upload de imágenes para comprobantes.
+
+Formatos permitidos:
+
+- image/jpeg
+- image/png
+- image/webp
+
+Tamaño máximo:
+
+- 5 MB
+
+Estrategias de almacenamiento:
+
+- Local (`/uploads`)
+- Cloudflare R2 (si las variables están configuradas)
+
+---
+
 ## Endpoints
+
+### Autenticación
+
+| Método | Ruta             | Auth | Descripción                  |
+| ------ | ---------------- | ---- | ---------------------------- |
+| POST   | `/auth/register` | ❌   | Crear cuenta, devuelve token |
+| POST   | `/auth/login`    | ❌   | Login, devuelve token        |
 
 ### Transactions
 
-| Método | Ruta                    | Descripción                                   |
-| ------ | ----------------------- | --------------------------------------------- |
-| GET    | `/transactions`         | Lista todas las transacciones                 |
-| GET    | `/transactions/balance` | Obtiene el balance total (ingresos - egresos) |
-| GET    | `/transactions/:id`     | Detalle de una transacción                    |
-| POST   | `/transactions`         | Crea una transacción                          |
-| PATCH  | `/transactions/:id`     | Actualiza una transacción                     |
-| DELETE | `/transactions/:id`     | Elimina una transacción                       |
+| Método | Ruta                    | Auth | Descripción                                |
+| ------ | ----------------------- | ---- | ------------------------------------------ |
+| GET    | `/transactions`         | ✅   | Lista todas las transacciones del usuario  |
+| GET    | `/transactions/balance` | ✅   | Obtiene el balance del usuario autenticado |
+| GET    | `/transactions/:id`     | ✅   | Detalle de una transacción                 |
+| POST   | `/transactions`         | ✅   | Crea una transacción                       |
+| PATCH  | `/transactions/:id`     | ✅   | Actualiza una transacción                  |
+| DELETE | `/transactions/:id`     | ✅   | Elimina una transacción                    |
+| POST   | `/transactions/upload`  | ✅   | Sube comprobante, devuelve URL             |
 
 ### Categorías
 
-| Método | Ruta              | Descripción                                      |
-| ------ | ----------------- | ------------------------------------------------ |
-| GET    | `/categories`     | Lista todas las categorías                       |
-| GET    | `/categories/:id` | Detalle de una categoría (con sus transacciones) |
-| POST   | `/categories`     | Crea una categoría                               |
-| PATCH  | `/categories/:id` | Actualiza una categoría                          |
-| DELETE | `/categories/:id` | Elimina una categoría                            |
+| Método | Ruta              | Auth | Descripción                                      |
+| ------ | ----------------- | ---- | ------------------------------------------------ |
+| GET    | `/categories`     | ✅   | Lista todas las categorías                       |
+| GET    | `/categories/:id` | ✅   | Detalle de una categoría (con sus transacciones) |
+| POST   | `/categories`     | ✅   | Crea una categoría                               |
+| PATCH  | `/categories/:id` | ✅   | Actualiza una categoría                          |
+| DELETE | `/categories/:id` | ✅   | Elimina una categoría                            |
 
 ---
 
@@ -234,7 +306,14 @@ Entry point de la aplicación. Carga las variables de entorno, crea la instancia
 
 ## Uso de IA
 
-Se hizo uso de Inteligencia artificial para detectar errores en nombres y referencias, además como asistente para construir las validaciones de Zod y aclarar el como usar Prisma.
+Se utilizó IA como herramienta de apoyo para:
+
+- detección de errores
+- aclaración de documentación técnica
+- planificación de implementación
+- generación de validaciones iniciales
+
+Toda la integración y validación final fue realizada manualmente.
 
 ---
 
@@ -244,10 +323,25 @@ La carpeta `bruno/` contiene una colección lista para usar con [Bruno](https://
 
 El orden recomendado para probar por primera vez:
 
-1. Crear una categoría (`POST /categories`)
-2. Crear una transaccion (`POST /transactions`) de tipo income
-3. Crear una transaccion (`POST /transactions`) de tipo expense
-4. Consultar el balance (`GET /transactions/balance`)
+1. `POST /auth/register` → guardar token automáticamente
+2. `POST /auth/login` → guardar token automáticamente
+   - Se puede hacer inicio de sesión con los usuarios del seeder:
+     - Usuario 1
+       - email: carlos@example.com
+       - password: password123
+     - Usuario 2
+       - email: ana@example.com
+       - password: password123
+3. `GET /categories` con token → debe funcionar
+4. `GET /categories` sin token → debe devolver `401`
+5. `POST /transactions/upload` con imagen > 5MB → debe devolver `422`
+6. `POST /transactions/upload` con imagen válida → debe devolver `{ receiptUrl }`
+7. `POST /transactions` con token → crear transacción (con `receiptUrl` en el body)
+8. `POST /transactions` con token → crear transacción (sin `receiptUrl` en el body)
+9. `GET /transactions` con token de usuario A → no debe ver transacciones de usuario B
+10. `DELETE /transactions/:id` con token de usuario B sobre transacción de usuario A → debe devolver `403`
+11. `DELETE /transactions/:id` con id inexistente → debe devolver `404`
+12. `GET /transactions/balance` → debe reflejar solo las transacciones del usuario autenticado
 
 ---
 
