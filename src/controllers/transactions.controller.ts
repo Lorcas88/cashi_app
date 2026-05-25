@@ -100,7 +100,8 @@ export const deleteTransaction = async (c: Context) => {
 
 // GET /transactions/balance
 export const getBalance = async (c: Context) => {
-  const transactions = await transactionsRepository.findAll()
+  const userId = c.get('userId');
+  const transactions = await transactionsRepository.findAll(userId)
 
   const totalIncome = transactions
     .filter(t => t.type === 'income')
