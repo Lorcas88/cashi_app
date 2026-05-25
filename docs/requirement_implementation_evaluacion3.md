@@ -158,7 +158,6 @@ git commit -m "feat(auth): add user repository and register/login controllers wi
 - Verificar header `Authorization: Bearer {token}` → extraer token → verificar con `jwt.verify` usando `JWT_SECRET`
 - Si el token es válido: adjuntar el payload al objeto `req` (ej. `req.user = { userId, email }`)
 - Si falta el header o el token es inválido/expirado: responder `401 Unauthorized`
-- Extender el tipo de `Request` de Express con una declaración de módulo para que TypeScript reconozca `req.user`
 
 > ⚠️ Este middleware debe ser **una sola función** importada en las rutas. El descuento de −15 pts aplica si se duplica en cada ruta.
 
