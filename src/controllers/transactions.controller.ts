@@ -8,7 +8,8 @@ import { parsePrismaError } from '../lib/prisma-error.js'
 
 // GET /transactions
 export const getTransactions = async (c: Context) => {
-  const transactions = await transactionsRepository.findAll()
+  const userId = c.get('userId');
+  const transactions = await transactionsRepository.findAll(userId)
   return c.json(transactions)
 }
 
@@ -21,11 +22,16 @@ export const getTransactionById = async (c: Context) => {
     return c.json({ error: 'Transacción no encontrada' }, 404)
   }
 
+  if (transaction.userId !== c.get('userId')) {
+    return c.json({ error: 'Operación prohibida' }, 403)
+  }
+
   return c.json(transaction)
 }
 
 // POST /transactions
 export const createTransaction = async (c: Context) => {
+  const userId = c.get('userId');
   const body = await c.req.json()
 
   const result = createTransactionSchema.safeParse(body)
@@ -34,7 +40,7 @@ export const createTransaction = async (c: Context) => {
   }
 
   try {
-    const transaction = await transactionsRepository.create(result.data)
+    const transaction = await transactionsRepository.create(result.data, userId)
     return c.json(transaction, 201)
   } catch (error) {
     const { status, message } = parsePrismaError(error)
@@ -46,6 +52,15 @@ export const createTransaction = async (c: Context) => {
 export const updateTransaction = async (c: Context) => {
   const id = Number(c.req.param('id'))
   const body = await c.req.json()
+
+  const transaction = await transactionsRepository.findById(id)
+  if (!transaction) {
+    return c.json({ error: 'Transacción no encontrada' }, 404)
+  }
+
+  if (transaction.userId !== c.get('userId')) {
+    return c.json({ error: 'Operación prohibida' }, 403)
+  }
 
   const result = updateTransactionSchema.safeParse(body)
   if (!result.success) {
@@ -64,6 +79,15 @@ export const updateTransaction = async (c: Context) => {
 // DELETE /transactions/:id
 export const deleteTransaction = async (c: Context) => {
   const id = Number(c.req.param('id'))
+
+  const transaction = await transactionsRepository.findById(id)
+  if (!transaction) {
+    return c.json({ error: 'Transacción no encontrada' }, 404)
+  }
+
+  if (transaction.userId !== c.get('userId')) {
+    return c.json({ error: 'Operación prohibida' }, 403)
+  }
 
   try {
     await transactionsRepository.remove(id)
