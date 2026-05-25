@@ -8,18 +8,19 @@ import {
   deleteTransaction,
   getBalance
 } from '../controllers/transactions.controller.js'
-import { authMiddleware } from '../middlewares/auth.middleware.js'
+import { uploadImage } from '../controllers/upload.controller.js'
 
 const transactionsRouter = new Hono()
 
 // Balance (debe ir antes de las rutas con parámetros para que no sea capturado por /:id)
-transactionsRouter.get('/balance', authMiddleware, getBalance)
+transactionsRouter.get('/balance', getBalance)
 
 // CRUD Transactions
-transactionsRouter.get('/', authMiddleware, getTransactions)
-transactionsRouter.get('/:id', authMiddleware, getTransactionById)
-transactionsRouter.post('/', authMiddleware, createTransaction)
-transactionsRouter.patch('/:id', authMiddleware, updateTransaction)
-transactionsRouter.delete('/:id', authMiddleware, deleteTransaction)
+transactionsRouter.post('/upload', uploadImage);
+transactionsRouter.get('/', getTransactions)
+transactionsRouter.get('/:id', getTransactionById)
+transactionsRouter.post('/', createTransaction)
+transactionsRouter.patch('/:id', updateTransaction)
+transactionsRouter.delete('/:id', deleteTransaction)
 
 export default transactionsRouter

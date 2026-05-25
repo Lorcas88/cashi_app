@@ -6,14 +6,13 @@ import {
   updateCategory,
   deleteCategory
 } from '../controllers/categories.controller.js'
-import { authMiddleware } from '../middlewares/auth.middleware.js'
 
 const categoriesRouter = new Hono()
 
-categoriesRouter.get('/', authMiddleware, getCategories)
-categoriesRouter.get('/:id', authMiddleware, getCategoryById)
-categoriesRouter.post('/', authMiddleware, createCategory)
-categoriesRouter.patch('/:id', authMiddleware, updateCategory)
-categoriesRouter.delete('/:id', authMiddleware, deleteCategory)
+categoriesRouter.get('/', getCategories)
+categoriesRouter.get('/:id', getCategoryById)
+categoriesRouter.post('/', createCategory)
+categoriesRouter.patch('/:id', updateCategory)
+categoriesRouter.delete('/:id', deleteCategory)
 
 export default categoriesRouter

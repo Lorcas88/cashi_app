@@ -7,6 +7,9 @@ export const createTransactionSchema = z.object({
   type: z.enum(['income', 'expense']),
   description: z.string().optional(),
   date: z.coerce.date(),
+  receiptUrl: z.string().url().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   categoryId: z.number().int().positive()
 })
 
@@ -17,6 +20,9 @@ export const updateTransactionSchema = z.object({
   type: z.enum(['income', 'expense']).optional(),
   description: z.string().optional(),
   date: z.coerce.date().optional(),
+  receiptUrl: z.string().url().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   categoryId: z.number().int().positive().optional()
 })
 

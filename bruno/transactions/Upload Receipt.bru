@@ -1,18 +1,17 @@
 meta {
-  name: Create Transaction
+  name: Upload Receipt
   type: http
-  seq: 2
+  seq: 8
 }
 
 post {
-  url: {{baseUrl}}/transactions
-  body: json
+  url: {{baseUrl}}/transactions/upload
+  body: multipartForm
   auth: bearer
 }
 
 headers {
   Accept: application/json
-  Content-Type: application/json
 }
 
 auth:bearer {
@@ -25,9 +24,12 @@ body:json {
     "type": "income",
     "description": "Pago por revisión de computador",
     "date": "2026-05-08",
-    "receiptUrl": "https://pub-3329e0de8b4441a79e8d44ffdb4fd21b.r2.dev/receipts/dd23d35a-5c5a-484b-8b1a-26a4a95722fe.jpg",
     "categoryId": 1
   }
+}
+
+body:multipart-form {
+  receipt: @file(C:\Users\carlo\Downloads\Recibo_tren_metropolitano_07.jpg)
 }
 
 script:post-response {

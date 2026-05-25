@@ -271,10 +271,10 @@ Flujo esperado
 
 1. POST /transactions/upload → { receiptUrl: "/uploads/uuid.jpg" } (local)
    → { receiptUrl: "https://pub-xxx.r2.dev/receipts/uuid.jpg" } (R2)
-2. POST /transactions → body incluye receiptUrl con la URL del paso anteriorgit commit -m "feat(upload): add dual-strategy upload lib (R2/local) and upload controller using Hono parseBody"
+2. POST /transactions → body incluye receiptUrl con la URL del paso anterior
 
 ```
-git commit -m "feat(upload): add multer middleware and upload controller for receipt images (local storage)"
+git commit -m "feat(upload): add dual-strategy upload lib (R2/local) and upload controller using Hono parseBody"
 ```
 
 ---

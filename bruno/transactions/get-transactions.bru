@@ -7,11 +7,15 @@ meta {
 get {
   url: {{baseUrl}}/transactions
   body: none
-  auth: none
+  auth: bearer
 }
 
 headers {
   Accept: application/json
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2FybG9zQGV4YW1wbGUuY29tIiwiZXhwIjoxNzgwMzE5MDg4fQ.xKh8nsBTfbdbBOk9hjBeZ-BJqx2jfB-4dQvCBtDnDN4
 }
 
 docs {

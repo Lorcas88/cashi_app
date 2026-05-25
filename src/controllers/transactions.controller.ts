@@ -23,7 +23,7 @@ export const getTransactionById = async (c: Context) => {
   }
 
   if (transaction.userId !== c.get('userId')) {
-    return c.json({ error: 'Operación prohibida' }, 403)
+    return c.json({ error: 'No autorizado' }, 403)
   }
 
   return c.json(transaction)
@@ -53,18 +53,18 @@ export const updateTransaction = async (c: Context) => {
   const id = Number(c.req.param('id'))
   const body = await c.req.json()
 
+  const result = updateTransactionSchema.safeParse(body)
+  if (!result.success) {
+    return c.json({ errors: result.error.issues }, 400)
+  }
+
   const transaction = await transactionsRepository.findById(id)
   if (!transaction) {
     return c.json({ error: 'Transacción no encontrada' }, 404)
   }
-
+  
   if (transaction.userId !== c.get('userId')) {
-    return c.json({ error: 'Operación prohibida' }, 403)
-  }
-
-  const result = updateTransactionSchema.safeParse(body)
-  if (!result.success) {
-    return c.json({ errors: result.error.issues }, 400)
+    return c.json({ error: 'No autorizado' }, 403)
   }
 
   try {
@@ -86,7 +86,7 @@ export const deleteTransaction = async (c: Context) => {
   }
 
   if (transaction.userId !== c.get('userId')) {
-    return c.json({ error: 'Operación prohibida' }, 403)
+    return c.json({ error: 'No autorizado' }, 403)
   }
 
   try {
