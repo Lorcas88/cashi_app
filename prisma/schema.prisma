@@ -24,7 +24,7 @@ model User {
   id           Int           @id @default(autoincrement())
   email        String        @unique
   passwordHash String
-  createdAt    DateTime
+  createdAt    DateTime      @default(now())
   transactions Transaction[]
 }
 
@@ -36,8 +36,8 @@ model Transaction {
   description String?
   date        DateTime        @db.Date
   receiptUrl  String?
-  latitude    Int?
-  longitude   Int?
+  latitude    Float?
+  longitude   Float?
   category    Category        @relation(fields: [categoryId], references: [id])
   categoryId  Int // foreign key
   user        User            @relation(fields: [userId], references: [id])

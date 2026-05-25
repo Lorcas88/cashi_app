@@ -6,10 +6,10 @@ import transactionRouter from './routes/transactions.routes.js'
 
 const app = new Hono()
 
-// Health check
+// Health check (no auth required)
 app.get('/', (c) => c.json({ status: 'ok', message: 'API de Finanzas — Cashi' }))
 
-// Montar routers por recurso
+// Montar routers por recurso (protected)
 app.route('/categories', categoriesRouter)
 app.route('/transactions', transactionRouter)
 
