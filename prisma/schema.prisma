@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -20,6 +20,14 @@ enum TransactionType {
   expense
 }
 
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  passwordHash String
+  createdAt    DateTime
+  transactions Transaction[]
+}
+
 // Una transaccion pertenece a una categoría y puede tener muchas etiquetas
 model Transaction {
   id          Int             @id @default(autoincrement())
@@ -27,6 +35,11 @@ model Transaction {
   type        TransactionType
   description String?
   date        DateTime        @db.Date
+  receiptUrl  String?
+  latitude    Int?
+  longitude   Int?
   category    Category        @relation(fields: [categoryId], references: [id])
   categoryId  Int // foreign key
+  user        User            @relation(fields: [userId], references: [id])
+  userId      Int
 }

@@ -1,9 +1,11 @@
 # Implementación de Evaluación Unidad 3 - Autenticación y Comprobantes
 
 ## Objetivo
+
 Implementar autenticación JWT con bcrypt, transacciones por usuario y subida de comprobantes en la API Cashi, manteniendo la arquitectura N-Layer existente.
 
 ## Requisitos Analizados
+
 1. **Modelo de Datos**
    - Nuevo modelo User: id, email (único), passwordHash, createdAt
    - Extender Transaction: receiptUrl, latitude, longitude, userId (FK a User)
@@ -12,7 +14,7 @@ Implementar autenticación JWT con bcrypt, transacciones por usuario y subida de
 2. **Autenticación**
    - POST /auth/register (registro con hash de contraseña, devuelve JWT)
    - POST /auth/login (login con verificación de contraseña, devuelve JWT)
-   - Middleware de autenticación para proteger rutas (excepto /auth/*)
+   - Middleware de autenticación para proteger rutas (excepto /auth/\*)
    - Passwords hasheados con bcrypt (nunca texto plano)
    - JWT generado y verificado correctamente
 
@@ -29,14 +31,15 @@ Implementar autenticación JWT con bcrypt, transacciones por usuario y subida de
    - URL devuelta se usa en campo receiptUrl de transacciones
 
 ## Capas Afectadas
+
 1. **Prisma Schema** - Agregar modelo User y extender Transaction
 2. **Repositories** - Actualizar para manejar relaciones User-Transaction
-3. **Controllers** - 
+3. **Controllers** -
    - Nuevos auth.controller.ts para register/login
    - Modificar transaction.controller.ts para userId automático y ownership check
    - Nuevo transaction.upload.controller.ts para subida de archivos
 4. **Routes** -
-   - Nuevas rutas /auth/*
+   - Nuevas rutas /auth/\*
    - Proteger rutas existentes con middleware
    - Nueva ruta /transactions/upload
 5. **Middleware** - Nuevo auth.middleware.ts para verificación de JWT
@@ -45,8 +48,9 @@ Implementar autenticación JWT con bcrypt, transacciones por usuario y subida de
 8. **Schemas** - Actualizar TransactionSchema para nuevos campos
 
 ## Flujo de Datos
+
 1. **Registro de Usuario**
-   - Request → /auth/register → Validator (Zod) → Auth Controller 
+   - Request → /auth/register → Validator (Zod) → Auth Controller
    - → Bcrypt hash password → Repository create User → Generate JWT → Response
 
 2. **Login**
@@ -54,24 +58,25 @@ Implementar autenticación JWT con bcrypt, transacciones por usuario y subida de
    - → Repository find User by email → Bcrypt compare → Generate JWT → Response
 
 3. **Rutas Protegidas**
-   - Request → Auth Middleware (verify JWT) → Extract userId from token → 
+   - Request → Auth Middleware (verify JWT) → Extract userId from token →
    - → Controller → Repository (with userId filter where applicable) → Response
 
 4. **Creación de Transacción**
-   - Request → /transactions → Auth Middleware → Validator (Zod) → 
+   - Request → /transactions → Auth Middleware → Validator (Zod) →
    - → Controller (add userId from token) → Repository create → Response
 
 5. **Ownership Check**
-   - Request → /transactions/:id → Auth Middleware → 
-   - → Controller (verify transaction.userId == token.userId) → 
+   - Request → /transactions/:id → Auth Middleware →
+   - → Controller (verify transaction.userId == token.userId) →
    - → Repository operation → Response (403 if mismatch)
 
 6. **Subida de Comprobante**
-   - Request → /transactions/upload → Auth Middleware → 
-   - → Validator (file type/size) → Upload Controller → 
+   - Request → /transactions/upload → Auth Middleware →
+   - → Validator (file type/size) → Upload Controller →
    - → Store file (local/R2) → Generate URL → Response with URL
 
 ## Orden Sugerido de Implementación
+
 1. **Actualizar Prisma Schema**
    - Agregar modelo User
    - Extender Transaction con nuevos campos
@@ -96,11 +101,15 @@ Implementar autenticación JWT con bcrypt, transacciones por usuario y subida de
 5. **Actualizar Balance**
    - Modificar getBalance controller para filtrar por userId
 
-6. **Actualizar Documentación**
+6. **Generar Seeder**
+   - Crear archivo seeder para testing
+
+7. **Actualizar Documentación**
    - Actualizar README con nuevas variables de entorno
    - Documentar flujo de autenticación y subida de archivos
 
 ## Estrategia de Validación
+
 1. **Pruebas Unitarias de Concepto**
    - Verificar que passwords se hashean correctamente
    - Verificar que JWT se genera y verifica
@@ -123,6 +132,7 @@ Implementar autenticación JWT con bcrypt, transacciones por usuario y subida de
 ## Ejemplos Conceptuales (Snippets Educativos)
 
 ### 1. Modelo User en Prisma Schema
+
 ```prisma
 model User {
   id        Int     @id @default(autoincrement())
@@ -134,6 +144,7 @@ model User {
 ```
 
 ### 2. Transaction Extendido
+
 ```prisma
 model Transaction {
   id          Int             @id @default(autoincrement())
@@ -152,132 +163,138 @@ model Transaction {
 ```
 
 ### 3. Middleware de Autenticación (Concepto)
+
 ```typescript
 // Pseudocódigo para auth middleware
 async function authMiddleware(c: Context, next: () => Promise<void>) {
-  const authHeader = c.req.header('Authorization')
+  const authHeader = c.req.header('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ error: 'Token requerido' }, 401)
+    return c.json({ error: 'Token requerido' }, 401);
   }
-  
-  const token = authHeader.split(' ')[1]
+
+  const token = authHeader.split(' ')[1];
   try {
-    const payload = verify(token, JWT_SECRET)
+    const payload = verify(token, JWT_SECRET);
     // Adjuntar userId al context para uso en controllers
-    c.set('userId', payload.userId)
-    await next()
+    c.set('userId', payload.userId);
+    await next();
   } catch (error) {
-    return c.json({ error: 'Token inválido' }, 401)
+    return c.json({ error: 'Token inválido' }, 401);
   }
 }
 ```
 
 ### 4. Ownership Check en Controller (Concepto)
+
 ```typescript
 // En transaction controller para update/delete
 export const updateTransaction = async (c: Context) => {
-  const userId = c.get('userId') // Desde middleware
-  const transactionId = Number(c.req.param('id'))
-  
+  const userId = c.get('userId'); // Desde middleware
+  const transactionId = Number(c.req.param('id'));
+
   // Primero verificar que la transacción pertenece al usuario
-  const transaction = await transactionsRepository.findById(transactionId)
+  const transaction = await transactionsRepository.findById(transactionId);
   if (!transaction) {
-    return c.json({ error: 'Transacción no encontrada' }, 404)
+    return c.json({ error: 'Transacción no encontrada' }, 404);
   }
-  
+
   if (transaction.userId !== userId) {
-    return c.json({ error: 'No autorizado' }, 403)
+    return c.json({ error: 'No autorizado' }, 403);
   }
-  
+
   // Luego proceder con la actualización normal
   // ...
-}
+};
 ```
 
 ### 5. Registro con Hash de Contraseña (Concepto)
+
 ```typescript
 // En auth controller para register
 export const register = async (c: Context) => {
   // Validar datos con Zod
-  const result = registerSchema.safeParse(await c.req.json())
+  const result = registerSchema.safeParse(await c.req.json());
   if (!result.success) {
-    return c.json({ errors: result.error.issues }, 400)
+    return c.json({ errors: result.error.issues }, 400);
   }
-  
-  const { email, password } = result.data
-  
+
+  const { email, password } = result.data;
+
   // Verificar si el email ya existe
-  const existingUser = await usersRepository.findByEmail(email)
+  const existingUser = await usersRepository.findByEmail(email);
   if (existingUser) {
-    return c.json({ error: 'Email ya registrado' }, 409)
+    return c.json({ error: 'Email ya registrado' }, 409);
   }
-  
+
   // Hashear la contraseña
-  const passwordHash = await bcrypt.hash(password, 10)
-  
+  const passwordHash = await bcrypt.hash(password, 10);
+
   // Crear usuario
   const user = await usersRepository.create({
     email,
-    passwordHash
-  })
-  
+    passwordHash,
+  });
+
   // Generar JWT
-  const token = sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' })
-  
-  return c.json({ token }, 201)
-}
+  const token = sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+
+  return c.json({ token }, 201);
+};
 ```
 
 ### 6. Subida de Archivo (Concepto)
+
 ```typescript
 // En upload controller
 export const uploadReceipt = async (c: Context) => {
   // Verificar que es multipart/form-data
-  const form = await c.req.parseBody()
-  const file = file.receipt as File | undefined
-  
+  const form = await c.req.parseBody();
+  const file = file.receipt as File | undefined;
+
   if (!file) {
-    return c.json({ error: 'Archivo requerido' }, 400)
+    return c.json({ error: 'Archivo requerido' }, 400);
   }
-  
+
   // Validar tipo de archivo
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
   if (!allowedTypes.includes(file.type)) {
-    return c.json({ error: 'Tipo de archivo no permitido' }, 400)
+    return c.json({ error: 'Tipo de archivo no permitido' }, 400);
   }
-  
+
   // Validar tamaño (5MB max)
   if (file.size > 5 * 1024 * 1024) {
-    return c.json({ error: 'Archivo demasiado grande (máximo 5MB)' }, 400)
+    return c.json({ error: 'Archivo demasiado grande (máximo 5MB)' }, 400);
   }
-  
+
   // Generar nombre único y guardar archivo
-  const fileName = `${uuid()}${getExtension(file.type)}`
-  const filePath = path.join(UPLOAD_DIR, fileName)
-  
+  const fileName = `${uuid()}${getExtension(file.type)}`;
+  const filePath = path.join(UPLOAD_DIR, fileName);
+
   // Guardar archivo (implementación depende de storage elegido)
-  await saveFile(file, filePath)
-  
+  await saveFile(file, filePath);
+
   // Generar URL pública
-  const receiptUrl = `${BASE_URL}/uploads/${fileName}`
-  
-  return c.json({ receiptUrl }, 200)
-}
+  const receiptUrl = `${BASE_URL}/uploads/${fileName}`;
+
+  return c.json({ receiptUrl }, 200);
+};
 ```
 
 ## Errores Comunes a Evitar
+
 1. **Olvidar hashear contraseñas** - Descuento automático de -10 pts
 2. **Duplicar middleware de auth en cada ruta** - -15 pts
 3. **Colocar ownership check en repository** - Viola separación de capas
 4. **Permitir que userId venga del body** - Debe venir exclusivamente del token
 5. **No validar tipo/tamaño de archivo en upload** - Vulnerabilidad de seguridad
-6. **Olvidar proteger rutas existentes** - Solo /auth/* deben estar sin protección
+6. **Olvidar proteger rutas existentes** - Solo /auth/\* deben estar sin protección
 7. **No filtrar transacciones por userId en repository methods** - Fuga de datos
 8. **Usar Prisma directamente en controllers** - Debe ir a través de repositories
 9. **No manejar errores de archivo correctamente** - Debe devolver 400 con mensaje claro
 10. **No actualizar README con nuevas variables de entorno** - -5 pts
 
 ## Próximos Pasos para el Estudiante
+
 1. **Analizar el esquema actual** en `prisma/schema.prisma`
 2. **Planear los cambios al esquema** para agregar User y extender Transaction
 3. **Crear el middleware de autenticación** antes de modificar cualquier controlador existente
@@ -290,6 +307,7 @@ export const uploadReceipt = async (c: Context) => {
 10. **Crear commits descriptivos** para cada funcionalidad implementada
 
 ## Sugerencia de Commits Descriptivos
+
 Para cumplir con el requisito de "historial de commits descriptivo", considere hacer commits como estos:
 
 1. `feat: add User model and extend Transaction schema`
@@ -306,7 +324,7 @@ Para cumplir con el requisito de "historial de commits descriptivo", considere h
    - Agregar rutas POST /auth/register y POST /auth/login
 
 4. `feat: protect existing routes with authentication middleware`
-   - Aplicar middleware a todas las rutas existentes excepto /auth/*
+   - Aplicar middleware a todas las rutas existentes excepto /auth/\*
    - Modificar src/routes/categories.routes.ts y src/routes/transactions.routes.ts
 
 5. `feat: add userId to transaction creation and update`
