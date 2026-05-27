@@ -37,7 +37,8 @@ const uploadLocal = async (file: File): Promise<string> => {
   const filename = `${randomUUID()}${path.extname(file.name) || '.jpg'}`;
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(UPLOADS_DIR, filename), buffer);
-  return `/uploads/${filename}`;
+  const baseUrl = 'http://localhost:3000';
+  return `${baseUrl}/uploads/${filename}`;
 };
 
 // Exportar una única función que decide internamente qué estrategia usar

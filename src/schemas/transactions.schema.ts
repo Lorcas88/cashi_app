@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import * as z from 'zod';
 
 // --- Create Transaction ---
 
@@ -7,11 +7,11 @@ export const createTransactionSchema = z.object({
   type: z.enum(['income', 'expense']),
   description: z.string().optional(),
   date: z.coerce.date(),
-  receiptUrl: z.string().url().optional(),
+  receiptUrl: z.url().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  categoryId: z.number().int().positive()
-})
+  categoryId: z.number().int().positive(),
+});
 
 // --- Update Transaction ---
 
@@ -20,13 +20,13 @@ export const updateTransactionSchema = z.object({
   type: z.enum(['income', 'expense']).optional(),
   description: z.string().optional(),
   date: z.coerce.date().optional(),
-  receiptUrl: z.string().url().optional(),
+  receiptUrl: z.url().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  categoryId: z.number().int().positive().optional()
-})
+  categoryId: z.number().int().positive().optional(),
+});
 
 // --- Types ---
 
-export type CreateTransactionInput = z.infer<typeof createTransactionSchema>
-export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>
+export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
+export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;

@@ -18,3 +18,5 @@ src/generated/
 
 # Logs
 *.log
+
+uploads/
