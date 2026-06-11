@@ -21,11 +21,24 @@ enum TransactionType {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  email        String        @unique
-  passwordHash String
-  createdAt    DateTime      @default(now())
-  transactions Transaction[]
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  passwordHash   String
+  createdAt      DateTime        @default(now())
+  transactions   Transaction[]
+  refreshTokens  RefreshToken[]
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
 }
 
 // Una transaccion pertenece a una categoría y puede tener muchas etiquetas

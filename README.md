@@ -214,16 +214,29 @@ Entry point de la aplicación. Carga las variables de entorno, crea la instancia
 
 ## Autenticación
 
-La API usa JWT Bearer Token.
+La API usa JWT Bearer Token con refresh tokens para sesiones persistentes en mobile.
 
-Las rutas protegidas requieren:
+### Tokens
 
-Authorization: Bearer <token>
+- **Access Token**: Expira en 15 minutos. Se usa en el header `Authorization: Bearer <token>`
+- **Refresh Token**: Expira en 30 días. Se usa para obtener nuevos access tokens
 
-El token se obtiene mediante:
+### Flujo
 
-- POST /auth/register
-- POST /auth/login
+1. Login/Register → Devuelve `accessToken` y `refreshToken`
+2. Usar `accessToken` en header Authorization para rutas protegidas
+3. Cuando expire (401), enviar `refreshToken` a `POST /auth/refresh`
+4. Recibir nuevos tokens
+5. Logout → Enviar `refreshToken` a `POST /auth/logout`
+
+### Ejemplo de respuesta
+
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+  "refreshToken": "a1b2c3d4e5f6..."
+}
+```
 
 ---
 
@@ -252,10 +265,12 @@ Estrategias de almacenamiento:
 
 ### Autenticación
 
-| Método | Ruta             | Auth | Descripción                  |
-| ------ | ---------------- | ---- | ---------------------------- |
-| POST   | `/auth/register` | ❌   | Crear cuenta, devuelve token |
-| POST   | `/auth/login`    | ❌   | Login, devuelve token        |
+| Método | Ruta              | Auth | Descripción                                    |
+| ------ | ----------------- | ---- | ---------------------------------------------- |
+| POST   | `/auth/register`  | ❌   | Crear cuenta, devuelve access y refresh token  |
+| POST   | `/auth/login`     | ❌   | Login, devuelve access y refresh token         |
+| POST   | `/auth/refresh`   | ❌   | Renueva access token usando refresh token      |
+| POST   | `/auth/logout`    | ✅   | Invalida el refresh token (logout)             |
 
 ### Transactions
 
