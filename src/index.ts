@@ -13,6 +13,7 @@ const app = new Hono();
 app.use(
   cors({
     origin: (origin) => {
+      console.log('Origin recibido:', origin);
       const allowed = [
         'http://localhost:8081',
         'https://cashi-app.onrender.com',
