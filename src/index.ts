@@ -6,8 +6,15 @@ import transactionRouter from './routes/transactions.routes.js'
 import authRouter from './routes/auth.routes.js'
 import { authMiddleware } from './middlewares/auth.middleware.js'
 import { serveStatic } from '@hono/node-server/serve-static';
+import { cors } from 'hono/cors';
 
 const app = new Hono()
+
+app.use('*', cors({
+  origin: ['http://localhost:8081', 'https://cashi-app.onrender.com'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+}))
 
 // Health check (no auth required)
 app.get('/', (c) => c.json({ status: 'ok', message: 'API de Finanzas — Cashi' }))
