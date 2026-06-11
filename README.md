@@ -4,6 +4,8 @@ API REST construida con arquitectura N-Layer para gestionar transacciones financ
 
 **Stack:** Node.js · TypeScript · Hono · Prisma 7 · Zod · PostgreSQL · Docker
 
+**URL de producción:** https://cashi-app.onrender.com
+
 ---
 
 ## Requisitos previos
@@ -336,10 +338,16 @@ Toda la integración y validación final fue realizada manualmente.
 
 La carpeta `bruno/` contiene una colección lista para usar con [Bruno](https://www.usebruno.com/), un cliente API open source. Abre Bruno, importa la carpeta y selecciona el entorno `Development`.
 
-El orden recomendado para probar por primera vez:
+### Flujo de autenticación
 
-1. `POST /auth/register` → guardar token automáticamente
-2. `POST /auth/login` → guardar token automáticamente
+1. **Register** o **Login** → guardan `accessToken` y `refreshToken` automáticamente
+2. **Refresh Token** → renueva ambos tokens usando el `refreshToken`
+3. **Logout** → invalida el `refreshToken`
+
+### Orden recomendado para probar
+
+1. `POST /auth/register` → guardar tokens automáticamente
+2. `POST /auth/login` → guardar tokens automáticamente
    - Se puede hacer inicio de sesión con los usuarios del seeder:
      - Usuario 1
        - email: carlos@example.com
@@ -347,16 +355,33 @@ El orden recomendado para probar por primera vez:
      - Usuario 2
        - email: ana@example.com
        - password: password123
-3. `GET /categories` con token → debe funcionar
-4. `GET /categories` sin token → debe devolver `401`
-5. `POST /transactions/upload` con imagen > 5MB → debe devolver `422`
-6. `POST /transactions/upload` con imagen válida → debe devolver `{ receiptUrl }`
-7. `POST /transactions` con token → crear transacción (con `receiptUrl` en el body)
-8. `POST /transactions` con token → crear transacción (sin `receiptUrl` en el body)
-9. `GET /transactions` con token de usuario A → no debe ver transacciones de usuario B
-10. `DELETE /transactions/:id` con token de usuario B sobre transacción de usuario A → debe devolver `403`
-11. `DELETE /transactions/:id` con id inexistente → debe devolver `404`
-12. `GET /transactions/balance` → debe reflejar solo las transacciones del usuario autenticado
+3. `POST /auth/refresh` → renovar tokens
+4. `POST /auth/logout` → invalidar refresh token
+5. `GET /categories` con token → debe funcionar
+6. `GET /categories` sin token → debe devolver `401`
+7. `POST /transactions/upload` con imagen > 5MB → debe devolver `422`
+8. `POST /transactions/upload` con imagen válida → debe devolver `{ receiptUrl }`
+9. `POST /transactions` con token → crear transacción (con `receiptUrl` en el body)
+10. `POST /transactions` con token → crear transacción (sin `receiptUrl` en el body)
+11. `GET /transactions` con token de usuario A → no debe ver transacciones de usuario B
+12. `DELETE /transactions/:id` con token de usuario B sobre transacción de usuario A → debe devolver `403`
+13. `DELETE /transactions/:id` con id inexistente → debe devolver `404`
+14. `GET /transactions/balance` → debe reflejar solo las transacciones del usuario autenticado
+
+### Requests de Bruno disponibles
+
+| Request | Endpoint | Auth | Descripción |
+|---------|----------|------|-------------|
+| Register | `POST /auth/register` | ❌ | Crear cuenta |
+| Login | `POST /auth/login` | ❌ | Iniciar sesión |
+| Refresh Token | `POST /auth/refresh` | ❌ | Renovar tokens |
+| Logout | `POST /auth/logout` | ✅ | Cerrar sesión |
+| Get Categories | `GET /categories` | ✅ | Listar categorías |
+| Create Category | `POST /categories` | ✅ | Crear categoría |
+| Get Transactions | `GET /transactions` | ✅ | Listar transacciones |
+| Create Transaction | `POST /transactions` | ✅ | Crear transacción |
+| Upload | `POST /transactions/upload` | ✅ | Subir comprobante |
+| Balance | `GET /transactions/balance` | ✅ | Ver balance |
 
 ---
 
