@@ -21,7 +21,7 @@ app.use(
       const tunnelPatterns = [
         /https:\/\/.*\.ngrok-free\.app$/,
         /https:\/\/.*\.ngrok\.io$/,
-        /https:\/\/.*\.exp\.direct$/,
+        /https?:\/\/.*\.exp\.direct$/,
       ];
 
       if (allowed.includes(origin)) return origin;
