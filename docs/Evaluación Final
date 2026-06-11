@@ -1,0 +1,126 @@
+# Examen Final — Cashi: Despliegue y Defensa
+
+**Ramo:** Desarrollo de Aplicaciones Web II
+
+**Modalidad:** Grupal — hasta 3 personas (mismo grupo de las unidades anteriores)
+
+**Fecha límite:** Viernes 12 de junio de 2026, 23:59
+
+---
+
+## Contexto del proyecto
+
+Durante las Unidades 2 y 3 construiste el backend completo de **Cashi**: una API con arquitectura N-Layer, base de datos PostgreSQL, autenticación con JWT y bcrypt, subida de comprobantes y coordenadas GPS.
+
+El último paso es llevar esa API a producción. En este examen debes desplegar Cashi en un servidor real accesible desde internet y defender las decisiones técnicas del proyecto ante la cámara.
+
+---
+
+## Requerimientos
+
+### Despliegue
+
+- La API debe estar desplegada y funcionando en una URL pública. Se recomienda **Render**, pero pueden usar cualquier plataforma equivalente (Railway, Fly.io, etc.) — justificar la elección en el video.
+- La base de datos debe ser una instancia PostgreSQL gestionada en la nube, no un Docker local.
+- Las variables de entorno (`DATABASE_URL`, `JWT_SECRET`, `R2_*`) deben estar configuradas en la plataforma — nunca en el repositorio.
+- Las migraciones deben haberse aplicado en producción (`prisma migrate deploy`).
+- El deploy debe estar conectado al repositorio de GitHub: un `git push` a la rama principal debe desencadenar un nuevo deploy automáticamente.
+
+### Video de defensa
+
+Video de **máximo 5 minutos** en Loom o YouTube (puede ser no listado) donde el grupo defiende el proyecto. Debe cubrir los tres ejes siguientes:
+
+**1. Elección de tecnologías**
+
+¿Por qué Hono y no Express? ¿Por qué Prisma y no un ORM distinto o SQL crudo? ¿Por qué PostgreSQL? ¿Por qué bcryptjs y no SHA-256? No se busca la respuesta “correcta” — se busca que puedan argumentar la elección con criterio.
+
+**2. Estructura de carpetas**
+
+Expliquen cómo está organizado el proyecto y por qué. ¿Qué vive en `routes/`, `controllers/`, `repositories/`, `schemas/`, `lib/`, `middlewares/`? ¿Por qué esa separación tiene sentido?
+
+**3. Decisiones de arquitectura**
+
+Elijan al menos dos de las siguientes y explíquenlas:
+
+- ¿Por qué JWT y no sessions? ¿Qué ventajas tiene para una API consumida desde móvil?
+- ¿Por qué el ownership check está en el controller y no en el repository?
+- ¿Por qué bcrypt es más adecuado que SHA-256 para contraseñas?
+- ¿Por qué los endpoints siguen convenciones REST? ¿Qué significa que una API sea RESTful?
+- ¿Por qué las categorías son globales y las transacciones son por usuario?
+
+---
+
+## Entregables
+
+1. **URL pública de la API** — debe estar activa al momento de la revisión. Se probará el flujo completo: register → login → crear transacción con comprobante → balance.
+2. **Repositorio en GitHub** — el mismo de las unidades anteriores, con los cambios de despliegue incorporados (scripts actualizados, `.gitignore` correcto, README con la URL de producción).
+3. **Video de defensa** — máximo 5 minutos, cubre los tres ejes descritos arriba.
+4. **Archivo `.txt` enviado por EVA** con:
+   - Nombres de los integrantes del grupo
+   - URL pública de la API
+   - URL del repositorio GitHub
+   - URL del video
+   - Fecha de entrega
+
+---
+
+## Rúbrica de evaluación
+
+**Total: 100 puntos**
+
+| Criterio                           | Puntaje | Descripción                                                                                                                                                                                                                                                         |
+| ---------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Despliegue funcional               | 40 pts  | La API responde en una URL pública. El flujo completo (register, login, transacciones, balance, subida de comprobante) funciona en producción. Las migraciones están aplicadas. Las variables de entorno están configuradas en la plataforma, no en el repositorio. |
+| Deploy automático                  | 15 pts  | El repositorio está conectado a la plataforma de despliegue. Un `git push` desencadena un nuevo deploy. Se evidencia en el historial de deploys de la plataforma.                                                                                                   |
+| Video — elección de tecnologías    | 15 pts  | El grupo argumenta con criterio por qué eligieron las tecnologías del stack. No se evalúa la respuesta “correcta” sino la capacidad de razonar la elección.                                                                                                         |
+| Video — estructura de carpetas     | 15 pts  | El grupo explica la organización del proyecto y por qué cada capa existe. Se nota que entienden la arquitectura N-Layer, no solo que la copiaron.                                                                                                                   |
+| Video — decisiones de arquitectura | 15 pts  | El grupo elige al menos dos decisiones y las defiende con argumento técnico. Las explicaciones son claras y demuestran comprensión real del código.                                                                                                                 |
+
+---
+
+## Criterios de descuento
+
+- **−20 pts** si la API no responde en la URL pública al momento de la revisión
+- **−15 pts** si las variables de entorno están hardcodeadas en el código o subidas al repositorio
+- **−10 pts** si las migraciones no están aplicadas en producción (la BD no tiene tablas)
+- **−5 pts** si el README no incluye la URL pública de la API
+- **−5 pts** si el video supera los 5 minutos
+
+---
+
+## Uso de IA
+
+Pueden usar IA para ayudarse con el despliegue y la preparación del video. Si la usaron, deben declararlo en el `README.md`.
+
+El video de defensa es individual en el sentido de que cada integrante debe poder responder preguntas sobre el código. Si durante la revisión se detecta que alguno no entiende lo que entregó, se evaluará en consecuencia.
+
+---
+
+## Consejos antes de empezar
+
+- Verifiquen que el `start` script apunta a `dist/index.mjs` — tsdown genera `.mjs`, no `.js`.
+- Asegúrense de que el `Build Command` incluye `yarn prisma generate` — sin esto el cliente de Prisma no existe en el servidor.
+- Corran las migraciones desde el Shell de la plataforma antes de probar la API: `yarn prisma migrate deploy`.
+- Usen la **Internal Database URL** de la plataforma como `DATABASE_URL`, no la External.
+- Generen un `JWT_SECRET` nuevo para producción con `openssl rand -base64 32` — nunca reutilicen el de desarrollo.
+- Prueben el flujo completo con Bruno apuntando a la URL de producción antes de grabar el video.
+
+---
+
+## Preguntas frecuentes
+
+**¿Puedo usar Railway o Fly.io en lugar de Render?**
+
+Sí. Cualquier plataforma que permita desplegar Node.js con PostgreSQL gestionado es válida. Justifícalo en el video.
+
+**¿Las imágenes guardadas localmente funcionan en producción?**
+
+No — el sistema de archivos en plataformas de cloud es efímero. Si usaron almacenamiento local en la Unidad 3, para el examen final deben migrar a Cloudflare R2 o documentar explícitamente en el README que la subida de comprobantes no está disponible en producción (con el descuento correspondiente en el criterio de despliegue funcional).
+
+**¿El video debe mostrar la pantalla?**
+
+Sí. Deben mostrar la API funcionando en producción (Bruno o curl apuntando a la URL pública) y el código mientras explican las decisiones.
+
+**¿Qué pasa si la plataforma suspende el servicio antes de la revisión?**
+
+El free tier de Render suspende instancias inactivas después de 15 minutos. Hagan un request a la API justo antes de la fecha de revisión para asegurarse de que esté activa.

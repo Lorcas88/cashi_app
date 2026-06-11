@@ -1,0 +1,35 @@
+meta {
+  name: Refresh Token
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "refreshToken": "{{refreshToken}}"
+  }
+}
+
+script:post-response {
+  const status = res.getStatus();
+  
+  if (status === 200) {
+    const data = res.getBody();
+    bru.setEnvVar('token', data.accessToken);
+    bru.setEnvVar('refreshToken', data.refreshToken);
+  }
+}
+
+docs {
+  Renueva el access token usando el refresh token.
+  
+  ## Respuesta
+  - 200: nuevos tokens generados
+  - 401: refresh token inválido o expirado
+}

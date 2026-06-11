@@ -1,0 +1,25 @@
+meta {
+  name: Logout
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/auth/logout
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "refreshToken": "{{refreshToken}}"
+  }
+}
+
+docs {
+  Cierra sesión invalidando el refresh token.
+  
+  ## Respuesta
+  - 200: sesión cerrada exitosamente
+  - 400: refresh token requerido
+}
