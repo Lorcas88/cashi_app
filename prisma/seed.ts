@@ -10,30 +10,44 @@ async function main() {
   // 1. Password hash
   const passwordHash = await bcrypt.hash('password123', 10);
 
-  // 2. Create test users
-  const carlos = await prisma.user.create({
-    data: {
+  // 2. Create test users (upsert for idempotency)
+  const carlos = await prisma.user.upsert({
+    where: { email: 'carlos@example.com' },
+    update: {},
+    create: {
       email: 'carlos@example.com',
       passwordHash,
     },
   });
-  const ana = await prisma.user.create({
-    data: {
+  const ana = await prisma.user.upsert({
+    where: { email: 'ana@example.com' },
+    update: {},
+    create: {
       email: 'ana@example.com',
       passwordHash,
     },
   });
 
-  // 3. Create global categories
-  const alimentacion = await prisma.category.create({
-    data: { name: 'Alimentación' },
+  // 3. Create global categories (upsert for idempotency)
+  const alimentacion = await prisma.category.upsert({
+    where: { name: 'Alimentación' },
+    update: {},
+    create: { name: 'Alimentación' },
   });
-  const transporte = await prisma.category.create({
-    data: { name: 'Transporte' },
+  const transporte = await prisma.category.upsert({
+    where: { name: 'Transporte' },
+    update: {},
+    create: { name: 'Transporte' },
   });
-  const sueldo = await prisma.category.create({ data: { name: 'Sueldo' } });
+  const sueldo = await prisma.category.upsert({
+    where: { name: 'Sueldo' },
+    update: {},
+    create: { name: 'Sueldo' },
+  });
 
-  // 4. Create transactions with a fake receipt
+  // 4. Reset and recreate transactions (idempotent)
+  await prisma.transaction.deleteMany();
+
   // Carlos transactions
   await prisma.transaction.create({
     data: {
