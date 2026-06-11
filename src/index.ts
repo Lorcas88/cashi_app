@@ -11,11 +11,22 @@ import { cors } from 'hono/cors';
 const app = new Hono();
 
 app.use(
-  '*',
   cors({
-    origin: ['https://cashi-app.onrender.com'],
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
+    origin: (origin) => {
+      const allowed = [
+        'http://localhost:8081',
+        'https://cashi-app.onrender.com',
+      ];
+      const tunnelPatterns = [
+        /https:\/\/.*\.ngrok-free\.app$/,
+        /https:\/\/.*\.ngrok\.io$/,
+        /https:\/\/.*\.exp\.direct$/,
+      ];
+
+      if (allowed.includes(origin)) return origin;
+      if (tunnelPatterns.some((pattern) => pattern.test(origin))) return origin;
+      return '';
+    },
   }),
 );
 
